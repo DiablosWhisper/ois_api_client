@@ -5,6 +5,7 @@ from datetime import datetime
 from .constants import PASSWORD_HASH_CRYPTO_TYPE, REQUEST_SIGNATURE_CRYPTO_TYPE, REQUEST_VERSION, HEADER_VERSION
 from .serialization.build_request_signature import build_request_signature
 from .serialization.hash_password import hash_password
+import typing
 
 from .v3_0 import dto
 
@@ -15,6 +16,8 @@ class HeaderFactoryParameters:
     tax_number: str
     password: str
     signature_key: str
+    operation: typing.Optional[str] = None
+    invoice_base64: typing.Optional[str] = None
 
 
 def _generate_request_id() -> str:
@@ -58,7 +61,9 @@ def make_header_factory(
                 value=build_request_signature(
                     request_id=request_id,
                     timestamp=timestamp,
-                    signature_key=p.signature_key),
+                    signature_key=p.signature_key,
+                    operation=p.operation,
+                    invoice_base64=p.invoice_base64),
                 crypto_type=REQUEST_SIGNATURE_CRYPTO_TYPE)
         )
 

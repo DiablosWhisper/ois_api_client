@@ -85,6 +85,7 @@ from .ManageAnnulmentOperation import ManageAnnulmentOperation
 from .ManageAnnulmentRequest import ManageAnnulmentRequest
 from .ManageInvoiceOperation import ManageInvoiceOperation
 from .ManageInvoiceRequest import ManageInvoiceRequest
+from .ManageInvoiceResponse import ManageInvoiceResponse
 from .MandatoryQueryParams import MandatoryQueryParams
 from .MarginScheme import MarginScheme
 from .MaterialNumbers import MaterialNumbers

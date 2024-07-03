@@ -1,5 +1,6 @@
 import logging
 from typing import Optional
+import typing
 
 import requests
 import xml.etree.ElementTree as ET
@@ -10,9 +11,13 @@ from .v3_0 import dto, namespaces as ns
 from .v3_0.deserialization.deserialize_query_invoice_data_response import deserialize_query_invoice_data_response
 from .v3_0.deserialization.deserialize_query_invoice_digest_response import deserialize_query_invoice_digest_response
 from .v3_0.deserialization.deserialize_token_exchange_response import deserialize_token_exchange_response
+from .v3_0.deserialization.deserialize_manage_invoice_response import deserialize_manage_invoice_response
+from .v3_0.deserialization.deserialize_query_transaction_status_response import deserialize_query_transaction_status_response
 from .serialization.serialize_query_invoice_data_request import serialize_query_invoice_data_request
 from .serialization.serialize_query_invoice_digest_request import serialize_query_invoice_digest_request
 from .serialization.serialize_token_exchange_request import serialize_token_exchange_request
+from .serialization.serialize_manage_invoice_request import serialize_manage_invoice_request
+from .serialization.serialize_query_transaction_status_request import serialize_query_transaction_status_request
 
 
 class Client:
@@ -21,6 +26,7 @@ class Client:
         self.timeout = timeout
         self.log_response = log_response
         ET.register_namespace('', ns.API)
+
 
     def token_exchange(self, data: dto.BasicOnlineInvoiceRequest) -> dto.TokenExchangeResponse:
         par = serialize_token_exchange_request(data)
@@ -32,6 +38,31 @@ class Client:
         root: ET.Element = ET.fromstring(response)
         result = deserialize_token_exchange_response(root)
         return result
+    
+
+    def manage_invoice(self, data: dto.ManageInvoiceRequest) -> dto.ManageInvoiceResponse:
+        par = serialize_manage_invoice_request(data)
+        response = self.call_operation('manageInvoice', par)
+
+        if self.log_response:
+            logging.info(response)
+
+        root: ET.Element = ET.fromstring(response)
+        result = deserialize_manage_invoice_response(root)
+        return result
+    
+
+    def query_transaction_status(self, data: dto.QueryTransactionStatusRequest) -> dto.QueryTransactionStatusResponse:
+        par = serialize_query_transaction_status_request(data)
+        response = self.call_operation('queryTransactionStatus', par)
+
+        if self.log_response:
+            logging.info(response)
+
+        root: ET.Element = ET.fromstring(response)
+        result = deserialize_query_transaction_status_response(root)
+        return result
+
 
     def query_invoice_digest(self, data: dto.QueryInvoiceDigestRequest) -> dto.QueryInvoiceDigestResponse:
         par = serialize_query_invoice_digest_request(data)
@@ -44,6 +75,7 @@ class Client:
         result = deserialize_query_invoice_digest_response(root)
         return result
 
+
     def query_invoice_data(self, data: dto.QueryInvoiceDataRequest) -> dto.QueryInvoiceDataResponse:
         par = serialize_query_invoice_data_request(data)
         response = self.call_operation('queryInvoiceData', par)
@@ -54,6 +86,7 @@ class Client:
         root: ET.Element = ET.fromstring(response)
         result = deserialize_query_invoice_data_response(root)
         return result
+
 
     def call_operation(self, operation: str, parameter: ET.Element) -> str:
         data = ET.tostring(parameter, method='xml', encoding='utf-8')
